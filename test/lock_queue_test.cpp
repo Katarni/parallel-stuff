@@ -1,4 +1,5 @@
 #include "lock_queue.h"
+#include "test_helper.h"
 
 #include <gtest/gtest.h>
 #include <vector>
@@ -11,7 +12,7 @@ std::mutex produce_tasks_mtx;
 std::vector<int> consumed_tasks;
 std::mutex consumed_tasks_mtx;
 
-void produce(kat_prl::lock_queue<int>& queue) {
+void produce(kat_prl::LockQueue<int>& queue) {
   for (;;) {
     int num;
 
@@ -27,7 +28,7 @@ void produce(kat_prl::lock_queue<int>& queue) {
   }
 }
 
-void consume(kat_prl::lock_queue<int>& queue) {
+void consume(kat_prl::LockQueue<int>& queue) {
   for (;;) {
     int num;
 
@@ -50,7 +51,7 @@ TEST_P(ThreadTest, IntTasksTest) {
 
   std::vector<std::thread> prods;
   std::vector<std::thread> cons;
-  kat_prl::lock_queue<int> queue;
+  kat_prl::LockQueue<int> queue;
 
   for (std::size_t i = 0; i < prods_cnt; ++i) {
     prods.emplace_back(produce, std::ref(queue));
@@ -74,9 +75,4 @@ TEST_P(ThreadTest, IntTasksTest) {
 }
 
 INSTANTIATE_TEST_SUITE_P(LockQueueTest, ThreadTest,
-                         ::testing::Values(std::make_pair(1, 1),
-                                           std::make_pair(1, 2),
-                                           std::make_pair(2, 2),
-                                           std::make_pair(2, 4),
-                                           std::make_pair(4, 4),
-                                           std::make_pair(10, 10)));
+                         ::testing::ValuesIn(threads_nums));

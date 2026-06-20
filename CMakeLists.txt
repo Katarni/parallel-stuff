@@ -9,5 +9,5 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 add_compile_options(-fsanitize=thread)
 add_link_options(-fsanitize=thread)
 
-add_subdirectory(queues)
+add_subdirectory(queue)
 add_subdirectory(test)

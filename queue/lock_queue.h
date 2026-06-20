@@ -7,7 +7,7 @@
 
 namespace kat_prl {
 template <typename T>
-class lock_queue {
+class LockQueue {
 private:
   std::mutex mtx_;
   std::vector<T> buf_;
@@ -42,8 +42,8 @@ private:
   }
 
 public:
-  lock_queue() : lock_queue(2048) {}
-  explicit lock_queue(std::size_t capacity) : buf_(capacity), is_done_(false), pos_(0), size_(0) {}
+  LockQueue() : LockQueue(2048) {}
+  explicit LockQueue(std::size_t capacity) : buf_(capacity), is_done_(false), pos_(0), size_(0) {}
 
   void push(T elm) {
     std::unique_lock lock{mtx_};
