@@ -23,6 +23,7 @@ TEST(GeneratorTest, FibonacciTest) {
   auto fib_num = fibonacci();
   std::size_t a = 0;
   std::size_t b = 1;
+  fib_num.next();
 
   for (std::size_t i = 0; i < 15; ++i) {
     EXPECT_EQ(fib_num.value(), a + b);

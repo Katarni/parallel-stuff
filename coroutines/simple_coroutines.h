@@ -13,7 +13,7 @@ public:
     T value;
 
     Generator get_return_object() { return coro_handle_t::from_promise(*this); }
-    auto initial_suspend() noexcept { return std::suspend_never{}; }
+    auto initial_suspend() noexcept { return std::suspend_always{}; }
     auto final_suspend() noexcept { return std::suspend_always{}; }
     void return_void() noexcept {}
     void unhandled_exception() { std::terminate(); }
