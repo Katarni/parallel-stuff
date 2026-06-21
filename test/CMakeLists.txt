@@ -6,6 +6,7 @@ target_sources(parallel-tests
         PRIVATE
         "lock_queue_test.cpp"
         "lock_free_stack_test.cpp"
+        "lock_free_queue_test.cpp"
 )
 
 include(FetchContent)
