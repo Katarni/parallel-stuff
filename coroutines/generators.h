@@ -9,18 +9,32 @@ namespace kat_coro {
 template <typename T>
 class Generator {
 public:
+  struct awaitable {
+    bool ready{true};
+
+    bool await_ready() const noexcept { return ready; }
+    void await_suspend(std::coroutine_handle<>) const noexcept {}
+    void await_resume() const noexcept {}
+  };
+
   struct promise_type {
-    T value;
+    friend Generator;
 
     Generator get_return_object() { return coro_handle_t::from_promise(*this); }
     auto initial_suspend() noexcept { return std::suspend_always{}; }
     auto final_suspend() noexcept { return std::suspend_always{}; }
     void return_void() noexcept {}
     void unhandled_exception() { std::terminate(); }
-    auto yield_value(const T& value) {
-      this->value = value;
-      return std::suspend_always{};
+    awaitable yield_value(const T& value) {
+      value_ = value;
+      return awaitable{static_cast<bool>(skip_cnt_ ? skip_cnt_-- : skip_cnt_)};
     }
+
+    T value() const { return value_; }
+
+  private:
+    std::size_t skip_cnt_{0};
+    T value_;
   };
 
   using coro_handle_t = std::coroutine_handle<promise_type>;
@@ -41,9 +55,13 @@ public:
     return *this;
   }
 
-  T value() const { return handle_.promise().value; }
+  T value() const { return handle_.promise().value(); }
 
-  bool next() { return handle_ ? (handle_.resume(), !handle_.done()) : false; }
+  bool resume() { return handle_ ? (handle_.resume(), !handle_.done()) : false; }
+  bool skip(std::size_t cnt) {
+    handle_.promise().skip_cnt_ = cnt;
+    return resume();
+  }
 
   void swap(Generator& other) noexcept {
     using std::swap;
