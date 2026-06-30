@@ -8,6 +8,7 @@ target_sources(tests
         "lock_free_stack_test.cpp"
         "lock_free_queue_test.cpp"
         "simple_coroutines_test.cpp"
+        "coro_subscribe_test.cpp"
 )
 
 include(FetchContent)

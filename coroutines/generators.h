@@ -18,7 +18,8 @@ public:
   };
 
   struct promise_type {
-    friend Generator;
+    std::size_t skip_cnt{0};
+    T value;
 
     Generator get_return_object() { return coro_handle_t::from_promise(*this); }
     auto initial_suspend() noexcept { return std::suspend_always{}; }
@@ -26,15 +27,9 @@ public:
     void return_void() noexcept {}
     void unhandled_exception() { std::terminate(); }
     awaitable yield_value(const T& value) {
-      value_ = value;
-      return awaitable{static_cast<bool>(skip_cnt_ ? skip_cnt_-- : skip_cnt_)};
+      this->value = value;
+      return awaitable{static_cast<bool>(skip_cnt ? skip_cnt-- : skip_cnt)};
     }
-
-    T value() const { return value_; }
-
-  private:
-    std::size_t skip_cnt_{0};
-    T value_;
   };
 
   using coro_handle_t = std::coroutine_handle<promise_type>;
@@ -55,11 +50,11 @@ public:
     return *this;
   }
 
-  T value() const { return handle_.promise().value(); }
+  T value() const { return handle_.promise().value; }
 
   bool resume() { return handle_ ? (handle_.resume(), !handle_.done()) : false; }
   bool skip(std::size_t cnt) {
-    handle_.promise().skip_cnt_ = cnt;
+    handle_.promise().skip_cnt = cnt;
     return resume();
   }
 
